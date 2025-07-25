@@ -13,21 +13,11 @@ const MOCK_INDEXES = [
     { name: "道琼斯", value: "32353.30", change: "-0.23%" },
   ];
   
-  const MOCK_HOT_STOCKS = {
-      volume: [ // 按成交量排序
-          { ticker: "BABA", name: "阿里巴巴", price: "89.45", change: "-5.67%", volume: "45.2M" },
-          { ticker: "NIO", name: "蔚来", price: "12.34", change: "-3.89%", volume: "32.1M" },
-          { ticker: "PDD", name: "拼多多", price: "67.89", change: "-4.23%", volume: "28.7M" },
-          { ticker: "XPEV", name: "小鹏汽车", price: "8.56", change: "-3.45%", volume: "19.8M" },
-      ],
-      change: [ // 按跌幅排序 (示例)
-          { ticker: "BABA", name: "阿里巴巴", price: "89.45", change: "-5.67%", volume: "45.2M" },
-          { ticker: "PDD", name: "拼多多", price: "67.89", change: "-4.23%", volume: "28.7M" },
-          { ticker: "NIO", name: "蔚来", price: "12.34", change: "-3.89%", volume: "32.1M" },
-          { ticker: "XPEV", name: "小鹏汽车", price: "8.56", change: "-3.45%", volume: "19.8M" },
-      ]
-  };
-  
+  const HOT_STOCK_UNIVERSE = [
+    'AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA', 'NVDA', // US Tech Giants
+    'BABA', 'NIO', 'PDD', 'XPEV' // Popular Chinese Stocks
+];
+
   const MOCK_SECTORS = [
       { name: "科技股", change: "+5.2%" },
       { name: "银行股", change: "-1.3%" },
@@ -84,8 +74,7 @@ const INDEX_TICKERS = ['^GSPC', '^DJI', '^IXIC', '000001.SS', '399001.SZ'];
             
             const formattedData = response.data.body.map(index => {
                 const formatChangePercent = (regularMarketChangePercent) => {
-                    const rawPercent = regularMarketChangePercent * 100; // Convert decimal to percentage
-                    const formattedPercent = rawPercent.toFixed(2); // Format to 2 decimal places
+                    const formattedPercent = regularMarketChangePercent.toFixed(2); // Format to 2 decimal places
                     return rawPercent > 0 ? `+${formattedPercent}%` : `${formattedPercent}%`; // Add sign and '%'
                 
                 };
@@ -110,10 +99,88 @@ const INDEX_TICKERS = ['^GSPC', '^DJI', '^IXIC', '000001.SS', '399001.SZ'];
        * @param {string} sortBy - 排序依据, e.g., 'volume', 'change'
        * 真实实现：调用外部API获取榜单数据
        */
-      static async fetchHotStocks(sortBy = 'volume') {
-          const data = MOCK_HOT_STOCKS[sortBy] || MOCK_HOT_STOCKS.volume;
-          return new Promise(resolve => setTimeout(() => resolve(data), 200));
-      }
+    /**
+     * 获取热门股票列表.
+     * Fetches data for a predefined list of stocks and sorts them on the server.
+     * @param {string} sortBy - The sorting criteria: 'volume', 'amplitude', or 'change'.
+     */
+    static async fetchHotStocks(sortBy = 'volume') {
+        if (!HOT_STOCK_UNIVERSE || HOT_STOCK_UNIVERSE.length === 0) {
+            return [];
+        }
+
+        const options = {
+            method: 'GET',
+            url: `https://${RAPIDAPI_HOST}/api/yahoo/qu/quote/${HOT_STOCK_UNIVERSE.join(',')}`,
+            headers: {
+                'x-rapidapi-key': RAPIDAPI_KEY,
+                'x-rapidapi-host': RAPIDAPI_HOST
+            }
+        };
+
+        try {
+            // 2. Fetch data for all stocks in our universe in one call
+            const response = await axios.request(options);
+            const stocks = response.data.body;
+
+            if (!Array.isArray(stocks)) {
+                console.error("API did not return a body array for hot stocks:", response.data);
+                throw new Error("获取热门股票数据格式不正确。");
+            }
+
+            // 3. Sort the results on our server based on the sortBy parameter
+            stocks.sort((a, b) => {
+                switch (sortBy) {
+                    case 'change':
+                        // 按涨跌幅排序 (从高到低)
+                        return (b.regularMarketChangePercent || 0) - (a.regularMarketChangePercent || 0);
+
+                    case 'amplitude':
+                        // 按振幅排序 (当日最高价 - 当日最低价) / 昨日收盘价
+                        const amplitudeA = ((a.regularMarketDayHigh - a.regularMarketDayLow) / a.regularMarketPreviousClose) || 0;
+                        const amplitudeB = ((b.regularMarketDayHigh - b.regularMarketDayLow) / b.regularMarketPreviousClose) || 0;
+                        return amplitudeB - amplitudeA;
+                    
+                    case 'volume':
+                    default:
+                        // 默认按成交量排序 (从高到低)
+                        return (b.regularMarketVolume || 0) - (a.regularMarketVolume || 0);
+                }
+            });
+
+            // 4. Map the sorted data to the clean format required by the frontend
+            const formattedData = stocks.map(stock => {
+                 const formatChangePercent = (changePercent) => {
+                    if (typeof changePercent !== 'number') return 'N/A';
+                    const percentage = changePercent.toFixed(2);
+                    return changePercent > 0 ? `+${percentage}%` : `${percentage}%`;
+                };
+                
+                // Helper to format large volume numbers
+                const formatVolume = (volume) => {
+                    if (typeof volume !== 'number') return 'N/A';
+                    if (volume > 1_000_000_000) return `${(volume / 1_000_000_000).toFixed(2)}B`;
+                    if (volume > 1_000_000) return `${(volume / 1_000_000).toFixed(2)}M`;
+                    if (volume > 1_000) return `${(volume / 1_000).toFixed(2)}K`;
+                    return volume.toString();
+                }
+
+                return {
+                    ticker: stock.symbol,
+                    name: stock.shortName || stock.symbol,
+                    price: (stock.regularMarketPrice || 0).toFixed(2),
+                    change: formatChangePercent(stock.regularMarketChangePercent),
+                    volume: formatVolume(stock.regularMarketVolume)
+                }
+            });
+
+            return formattedData;
+
+        } catch (error) {
+            console.error('调用热门股票API失败:', error.response ? error.response.data : error.message);
+            throw new Error('获取热门股票数据失败。');
+        }
+    }
   
       /**
        * 获取行业板块
