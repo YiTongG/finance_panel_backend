@@ -1,6 +1,6 @@
 // controllers/stockController.js
  
-const StockModel = require('../models/stockModel');
+const StockModel = require('../models/stockModel'); 
 
 // 获取大盘指数
 exports.getIndexes = async (req, res) => {
