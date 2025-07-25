@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -8,10 +9,14 @@ const PORT = 5000;
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
+app.get('/', (req, res) => res.send('服务器已启动'));
 
 // Routes
 const transactionRoutes = require('./routes/transactionRoutes');
+const stocksRoutes = require('./routes/stocksRoutes');
+
 app.use('/api/transactions', transactionRoutes);
+app.use('/api/stocks', stocksRoutes);
 
 // Start server
 app.listen(PORT, () => {

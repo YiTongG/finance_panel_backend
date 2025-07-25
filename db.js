@@ -1,10 +1,12 @@
 const mysql = require('mysql');
+require('dotenv').config();
+
 
 const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '123456',
-  database: 'finance_db'
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE
 });
 
 db.connect(err => {
@@ -12,7 +14,7 @@ db.connect(err => {
     console.error('MySQL connection error:', err.stack);
     return;
   }
-  //console.log('MySQL connected as id', db.threadId);
+  console.log('MySQL connected as id', db.threadId);
 });
 
 module.exports = db;
