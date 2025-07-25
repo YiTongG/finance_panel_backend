@@ -1,5 +1,5 @@
 // controllers/stockController.js
-
+ 
 const StockModel = require('../models/stockModel');
 
 // 获取大盘指数
