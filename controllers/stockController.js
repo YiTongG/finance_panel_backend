@@ -23,13 +23,13 @@ exports.getHotStocks = async (req, res) => {
     }
 };
 
-// 获取行业板块
-exports.getSectors = async (req, res) => {
+// 获取股票趋势
+exports.getTrends = async (req, res) => {
     try {
-        const data = await StockModel.fetchSectors();
+        const data = await StockModel.fetchTrends();
         res.json(data);
     } catch (error) {
-        res.status(500).json({ message: '获取行业板块数据失败', error: error.message });
+        res.status(500).json({ message: '获取趋势失败', error: error.message });
     }
 };
 

@@ -11,8 +11,9 @@ router.get('/indexes', stockController.getIndexes);
 // GET /api/stocks/hot -> 获取热门股票
 router.get('/hot', stockController.getHotStocks);
 
-// GET /api/stocks/sectors -> 获取行业板块
-router.get('/sectors', stockController.getSectors);
+// GET /api/stocks/getTrends -> 搜索股票
+router.get('/getTrends', stockController.getTrends);
+
 
 // GET /api/stocks/search -> 搜索股票
 router.get('/search', stockController.searchStocks);
