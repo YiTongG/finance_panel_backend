@@ -12,8 +12,7 @@ router.get('/indexes', stockController.getIndexes);
 router.get('/hot', stockController.getHotStocks);
 
 // GET /api/stocks/getTrends -> 获取股票推荐趋势
-router.get('/getTrends', stockController.getTrends);
-
+router.get('/getTrends/:symbol', stockController.getTrends);
 
 // GET /api/stocks/search -> 搜索股票
 router.get('/search', stockController.searchStocks);
