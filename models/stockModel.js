@@ -75,7 +75,7 @@ const INDEX_TICKERS = ['^GSPC', '^DJI', '^IXIC', '000001.SS', '399001.SZ'];
             const formattedData = response.data.body.map(index => {
                 const formatChangePercent = (regularMarketChangePercent) => {
                     const formattedPercent = regularMarketChangePercent.toFixed(2); // Format to 2 decimal places
-                    return rawPercent > 0 ? `+${formattedPercent}%` : `${formattedPercent}%`; // Add sign and '%'
+                    return formattedPercent > 0 ? `+${formattedPercent}%` : `${formattedPercent}%`; // Add sign and '%'
                 
                 };
 
