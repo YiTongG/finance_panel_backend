@@ -40,6 +40,7 @@ const MOCK_INDEXES = [
 // models/stocksModel.js
 const axios = require('axios');
 
+
 const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY;
 const RAPIDAPI_HOST = process.env.RAPIDAPI_HOST;
 
@@ -194,10 +195,14 @@ const INDEX_TICKERS = ['^GSPC', '^DJI', '^IXIC', '000001.SS', '399001.SZ'];
        * 获取股票趋势
        * 真实实现：调用外部API获取股票趋势推荐买入购入，
        */
-      static async fetchTrends() {
+      static async fetchTrends(symbol) {
+        if (!symbol) {
+            throw new Error("股票代码（symbol）不能为空");
+        }
+    
         const options = {
             method: 'GET',
-            url: `https://${RAPIDAPI_HOST}/api/stocks/module${HOT_STOCK_UNIVERSE}`,
+            url: `https://${RAPIDAPI_HOST}/api/v1/markets/stock/modules?ticker=${symbol}&module=recommendation-trend`,
             headers: {
                 'x-rapidapi-key': RAPIDAPI_KEY,
                 'x-rapidapi-host': RAPIDAPI_HOST
@@ -206,34 +211,36 @@ const INDEX_TICKERS = ['^GSPC', '^DJI', '^IXIC', '000001.SS', '399001.SZ'];
         
         try {
             const response = await axios.request(options);
-            const stocks = response.data.body;
-             // 检查返回的数据是否是一个数组
-             if (!Array.isArray(stocks)) {
-                console.error("API did not return an array:", response.data.body);
-                throw new Error("从 Yahoo Finance API 获取的数据格式不正确。");
-             }
-             // 提取只保留需要的字段 
-          const trendData = stocks.trend.map(periodData => ({
-            period: periodData.period,
-            strongBuy: periodData.strongBuy, 
-            buy: periodData.buy, 
-            hold: periodData.hold,
-            sell: periodData.sell,
-            strongSell: periodData.strongSell
-        }));
-
-          // 构建包含板块、股票名称和关键指标的响应
-        const result = {
-            stockName: HOT_STOCK_UNIVERSE,   
-            trends: trendData       
-        };
-            res.json(result);
+            const stockData = response.data.body; // 获取返回的body数据
+            console.log("获取股票趋势数据:", stockData);
+            
+            // 关键修改：直接验证stockData下的trend数组
+            if (!stockData || !Array.isArray(stockData.trend)) {
+                console.error("API返回数据格式错误，trend数组不存在或不是数组:", stockData);
+                throw new Error("从API获取的趋势数据格式不正确（未找到有效的trend数组）");
+            }
+            
+            // 直接从stockData.trend数组提取所需字段
+            const trendData = stockData.trend.map(item => ({
+                period: item.period || '未知周期',
+                strongBuy: item.strongBuy || 0,
+                buy: item.buy || 0,
+                hold: item.hold || 0,
+                sell: item.sell || 0,
+                strongSell: item.strongSell || 0
+            }));
+    
+            return {
+                stockName: symbol,
+                trends: trendData,
+                maxAge: stockData.maxAge || null,
+           
+            };
         } catch (error) {
-            console.error('获取股票推荐趋势失败:', error.response ? error.response.data : error.message);
-            throw new Error('获取股票推荐趋势失败。');
+            console.error(`获取股票 ${symbol} 推荐趋势失败:`, error.response ? error.response.data : error.message);
+            throw new Error(`获取股票 ${symbol} 推荐趋势失败: ${error.message}`);
         }
-      
-      }
+    }
   
       /**
        * 搜索股票
