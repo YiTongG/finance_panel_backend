@@ -204,7 +204,7 @@ const INDEX_TICKERS = ['^GSPC', '^DJI', '^IXIC', '000001.SS', '399001.SZ'];
                 console.error("API did not return an array:", response.data.body);
                 throw new Error("从 Yahoo Finance API 获取的数据格式不正确。");
              }
-             // 提取只保留需要的字段
+             // 提取只保留需要的字段 
           const trendData = stocks.trend.map(periodData => ({
             period: periodData.period,
             strongBuy: periodData.strongBuy,
