@@ -41,8 +41,8 @@ const MOCK_INDEXES = [
 const axios = require('axios');
 
 
-const RAPIDAPI_KEY =RAPIDAPI_KEY ;
-const RAPIDAPI_HOST =RAPIDAPI_HOST;
+const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY ;
+const RAPIDAPI_HOST = process.env.RAPIDAPI_HOST;
 
 // (Ticker)
 // ^GSPC: 标普500, ^DJI: 道琼斯, ^IXIC: 纳斯达克
@@ -112,7 +112,7 @@ const INDEX_TICKERS = ['^GSPC', '^DJI', '^IXIC', '000001.SS', '399001.SZ'];
 
         const options = {
             method: 'GET',
-            url: `https://${RAPIDAPI_HOST}/api/v1/markets/stock/modules/${HOT_STOCK_UNIVERSE.join(',')}`,
+            url: `https://${RAPIDAPI_HOST}/api/yahoo/qu/quote/${HOT_STOCK_UNIVERSE.join(',')}`,
             headers: {
                 'x-rapidapi-key': RAPIDAPI_KEY,
                 'x-rapidapi-host': RAPIDAPI_HOST
