@@ -60,7 +60,7 @@ const INDEX_TICKERS = ['^GSPC', '^DJI', '^IXIC', '000001.SS', '399001.SZ'];
             headers: {
                 'x-rapidapi-key': RAPIDAPI_KEY,
                 'x-rapidapi-host': RAPIDAPI_HOST
-            }
+            } 
         };
 
         try {
@@ -183,11 +183,48 @@ const INDEX_TICKERS = ['^GSPC', '^DJI', '^IXIC', '000001.SS', '399001.SZ'];
     }
   
       /**
-       * 获取行业板块
-       * 真实实现：调用外部API获取板块数据，或者自己根据成分股计算
+       * 获取股票趋势
+       * 真实实现：调用外部API获取股票趋势推荐买入购入，
        */
-      static async fetchSectors() {
-          return new Promise(resolve => setTimeout(() => resolve(MOCK_SECTORS), 150));
+      static async fetchTrends() {
+        const options = {
+            method: 'GET',
+            url: `https://${RAPIDAPI_HOST}/api/stocks/getTrends${HOT_STOCK_UNIVERSE}`,
+            headers: {
+                'x-rapidapi-key': RAPIDAPI_KEY,
+                'x-rapidapi-host': RAPIDAPI_HOST
+            } 
+        };
+        
+        try {
+            const response = await axios.request(options);
+            const stocks = response.data.body;
+             // 检查返回的数据是否是一个数组
+             if (!Array.isArray(stocks)) {
+                console.error("API did not return an array:", response.data.body);
+                throw new Error("从 Yahoo Finance API 获取的数据格式不正确。");
+             }
+             // 提取只保留需要的字段 
+          const trendData = stocks.trend.map(periodData => ({
+            period: periodData.period,
+            strongBuy: periodData.strongBuy, 
+            buy: periodData.buy, 
+            hold: periodData.hold,
+            sell: periodData.sell,
+            strongSell: periodData.strongSell
+        }));
+
+          // 构建包含板块、股票名称和关键指标的响应
+        const result = {
+            stockName: HOT_STOCK_UNIVERSE,   
+            trends: trendData       
+        };
+            res.json(result);
+        } catch (error) {
+            console.error('获取股票推荐趋势失败:', error.response ? error.response.data : error.message);
+            throw new Error('获取股票推荐趋势失败。');
+        }
+      
       }
   
       /**
