@@ -6,7 +6,7 @@ const StockModel = require('../models/stockModel');
 exports.getIndexes = async (req, res) => {
     try {
         const data = await StockModel.fetchIndexes();
-        res.json(data);
+        res.json(data); 
     } catch (error) {
         res.status(500).json({ message: '获取指数数据失败', error: error.message });
     }

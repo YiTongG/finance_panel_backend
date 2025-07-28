@@ -207,7 +207,7 @@ const INDEX_TICKERS = ['^GSPC', '^DJI', '^IXIC', '000001.SS', '399001.SZ'];
              // 提取只保留需要的字段 
           const trendData = stocks.trend.map(periodData => ({
             period: periodData.period,
-            strongBuy: periodData.strongBuy,
+            strongBuy: periodData.strongBuy, 
             buy: periodData.buy, 
             hold: periodData.hold,
             sell: periodData.sell,

@@ -5,7 +5,7 @@ const router = express.Router();
 const stockController = require('../controllers/stockController');
 
 // 定义各个API端点 
-// GET /api/stocks/indexes -> 获取大盘指数
+// GET /api/stocks/indexes -> 获取大盘指数 
 router.get('/indexes', stockController.getIndexes);
 
 // GET /api/stocks/hot -> 获取热门股票
