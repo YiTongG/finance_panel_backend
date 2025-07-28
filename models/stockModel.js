@@ -41,7 +41,7 @@ const MOCK_INDEXES = [
 const axios = require('axios');
 
 
-const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY ;
+const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY;
 const RAPIDAPI_HOST = process.env.RAPIDAPI_HOST;
 
 // (Ticker)
@@ -151,31 +151,39 @@ const INDEX_TICKERS = ['^GSPC', '^DJI', '^IXIC', '000001.SS', '399001.SZ'];
 
             // 4. Map the sorted data to the clean format required by the frontend
             const formattedData = stocks.map(stock => {
-                 const formatChangePercent = (changePercent) => {
-                    if (typeof changePercent !== 'number') return 'N/A';
-                    const percentage = changePercent.toFixed(2);
-                    return changePercent > 0 ? `+${percentage}%` : `${percentage}%`;
-                };
-                
-                // Helper to format large volume numbers
-                const formatVolume = (volume) => {
-                    if (typeof volume !== 'number') return 'N/A';
-                    if (volume > 1_000_000_000) return `${(volume / 1_000_000_000).toFixed(2)}B`;
-                    if (volume > 1_000_000) return `${(volume / 1_000_000).toFixed(2)}M`;
-                    if (volume > 1_000) return `${(volume / 1_000).toFixed(2)}K`;
-                    return volume.toString();
-                }
+                const formatChangePercent = (changePercent) => {
+                   if (typeof changePercent !== 'number') return 'N/A';
+                   const percentage = changePercent.toFixed(2);
+                   return changePercent > 0 ? `+${percentage}%` : `${percentage}%`;
+               };
+               
+               // Helper to format large volume numbers
+               const formatVolume = (volume) => {
+                   if (typeof volume !== 'number') return 'N/A';
+                   if (volume > 1_000_000_000) return `${(volume / 1_000_000_000).toFixed(2)}B`;
+                   if (volume > 1_000_000) return `${(volume / 1_000_000).toFixed(2)}M`;
+                   if (volume > 1_000) return `${(volume / 1_000).toFixed(2)}K`;
+                   return volume.toString();
+               }
 
-                return {
-                    ticker: stock.symbol,
-                    name: stock.shortName || stock.symbol,
-                    price: (stock.regularMarketPrice || 0).toFixed(2),
-                    change: formatChangePercent(stock.regularMarketChangePercent),
-                    volume: formatVolume(stock.regularMarketVolume)
-                }
-            });
+               // Calculate and format amplitude
+               const amplitudeRatio = (stock.regularMarketDayHigh && stock.regularMarketDayLow && stock.regularMarketPreviousClose)
+                   ? (stock.regularMarketDayHigh - stock.regularMarketDayLow) / stock.regularMarketPreviousClose
+                   : 0;
+               
+               const formattedAmplitude = `${(amplitudeRatio * 100).toFixed(2)}%`;
 
-            return formattedData;
+               return {
+                   ticker: stock.symbol,
+                   name: stock.shortName || stock.symbol,
+                   price: (stock.regularMarketPrice || 0).toFixed(2),
+                   change: formatChangePercent(stock.regularMarketChangePercent),
+                   volume: formatVolume(stock.regularMarketVolume),
+                   amplitude: formattedAmplitude
+               }
+           });
+           
+           return formattedData;
 
         } catch (error) {
             console.error('调用热门股票API失败:', error.response ? error.response.data : error.message);
@@ -233,10 +241,7 @@ const INDEX_TICKERS = ['^GSPC', '^DJI', '^IXIC', '000001.SS', '399001.SZ'];
             throw new Error(`获取股票 ${symbol} 推荐趋势失败: ${error.message}`);
         }
     }
-    
-    
-    
-    
+  
       /**
        * 搜索股票
        * @param {string} query - 搜索关键词
