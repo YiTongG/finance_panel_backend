@@ -44,10 +44,32 @@ const axios = require('axios');
 const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY;
 const RAPIDAPI_HOST = process.env.RAPIDAPI_HOST;
 
-// (Ticker)
-// ^GSPC: 标普500, ^DJI: 道琼斯, ^IXIC: 纳斯达克
-// 000001.SS: 上证指数, 399001.SZ: 深证成指
-const INDEX_TICKERS = ['^GSPC', '^DJI', '^IXIC', '000001.SS', '399001.SZ'];
+const INDEX_TICKERS = [
+    // US Indices
+    '^GSPC', // S&P 500
+    '^DJI',  // Dow Jones Industrial Average
+    '^IXIC', // NASDAQ Composite
+
+    // China Indices
+    '000001.SS', // SSE Composite Index (Shanghai)
+    '399001.SZ', // SZSE Component Index (Shenzhen)
+
+    // Other Asia-Pacific Indices
+    '^N225',     // Nikkei 225 (Japan)
+    '^HSI',      // Hang Seng Index (Hong Kong)
+
+    // European Indices
+    '^FTSE',     // FTSE 100 (UK)
+    '^FCHI',     // CAC 40 (France)
+
+    // --- Added for World Map Coverage ---
+    '^GDAXI',    // DAX (Germany)
+    '^GSPTSE',   // S&P/TSX Composite (Canada)
+    '^AXJO',     // S&P/ASX 200 (Australia)
+    '^NSEI',     // NIFTY 50 (India)
+    '^BVSP',     // Bovespa Index (Brazil)
+    '^KS11'      // KOSPI Composite Index (South Korea)
+];
   class StockModel {
       /**
        * 获取大盘指数
@@ -81,7 +103,7 @@ const INDEX_TICKERS = ['^GSPC', '^DJI', '^IXIC', '000001.SS', '399001.SZ'];
                 };
 
                 return {
-                    name: index.shortName || index.longName,
+                    name: (index.shortName || index.longName).replace(/\s{2,}/g, ' '),
                     value: parseFloat(index.regularMarketPrice).toFixed(2),
                     change: formatChangePercent(index.regularMarketChangePercent)
                 };
