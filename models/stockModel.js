@@ -3,47 +3,17 @@
 // const axios = require('axios'); // 真实情况会用axios等工具请求外部API
 const db = require('../db'); // 导入你的数据库连接
 
-// --- 模拟数据区 ---
-// 在真实应用中，这些数据会从外部API或数据库获取
-const MOCK_INDEXES = [
-    { name: "上证指数", value: "3625.44", change: "-0.87%" },
-    { name: "深证成指", value: "10788.01", change: "-0.45%" },
-    { name: "标普500", value: "4488.08", change: "+0.92%" },
-    { name: "纳斯达克", value: "11840.40", change: "+1.15%" },
-    { name: "道琼斯", value: "32353.30", change: "-0.23%" },
-  ];
-  
+
   const HOT_STOCK_UNIVERSE = [
     'AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA', 'NVDA', // US Tech Giants
     'BABA', 'NIO', 'PDD', 'XPEV' // Popular Chinese Stocks
 ];
-
-  const MOCK_SECTORS = [
-      { name: "科技股", change: "+5.2%" },
-      { name: "银行股", change: "-1.3%" },
-      { name: "新能源", change: "+3.8%" },
-      { name: "医药生物", change: "+2.1%" },
-      { name: "房地产", change: "-2.2%" },
-      { name: "消费股", change: "-0.8%" },
-  ];
-  
-  const MOCK_STOCK_LIST = [
-      { ticker: 'BABA', name: '阿里巴巴' },
-      { ticker: 'PDD', name: '拼多多' },
-      { ticker: 'NIO', name: '蔚来' },
-      { ticker: 'XPEV', name: '小鹏汽车' },
-      { ticker: 'TSLA', name: '特斯拉' },
-      { ticker: 'AAPL', name: '苹果公司' },
-  ];
-//  --- 模拟数据区结束 ---
   
 // models/stocksModel.js
 const axios = require('axios');
-// const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY;
-// const RAPIDAPI_HOST = process.env.RAPIDAPI_HOST;
+const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY;
+const RAPIDAPI_HOST = process.env.RAPIDAPI_HOST;
 
-const RAPIDAPI_KEY ="49d24ba246mshba11ea8aedeb983p1ae17djsn428ecf5c3ad1";
-const RAPIDAPI_HOST ="yahoo-finance15.p.rapidapi.com ";
 
 
 const INDEX_TICKERS = [
@@ -160,12 +130,12 @@ const INDEX_TICKERS = [
                         // 按涨跌幅排序 (从高到低)
                         return (b.regularMarketChangePercent || 0) - (a.regularMarketChangePercent || 0);
 
-                    case 'amplitude':
+                    case 'amplitude':{
                         // 按振幅排序 (当日最高价 - 当日最低价) / 昨日收盘价
                         const amplitudeA = ((a.regularMarketDayHigh - a.regularMarketDayLow) / a.regularMarketPreviousClose) || 0;
                         const amplitudeB = ((b.regularMarketDayHigh - b.regularMarketDayLow) / b.regularMarketPreviousClose) || 0;
                         return amplitudeB - amplitudeA;
-                    
+                    }
                     case 'volume':
                     default:
                         // 默认按成交量排序 (从高到低)
