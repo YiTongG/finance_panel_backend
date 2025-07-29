@@ -17,12 +17,13 @@ app.get('/', (req, res) => res.send('服务器已启动'));
 const transactionRoutes = require('./routes/transactionRoutes');
 const stocksRoutes = require('./routes/stocksRoutes');
 const indexRoutes = require('./routes/indexRoutes');
+const globalRoutes  = require('./routes/globalRoutes')
 
 
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/indexes', indexRoutes);
-
 app.use('/api/stocks', stocksRoutes);
+app.use('/api/global', globalRoutes);
 
 
 // Start server
