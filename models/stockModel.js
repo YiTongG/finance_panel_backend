@@ -90,8 +90,8 @@ const INDEX_TICKERS = [
     }
   
       /**
-       * 获取热门股票
-       * @param {string} sortBy - 排序依据, e.g., 'volume', 'change'
+       * get hot stock
+       * @param {string} sortBy -  e.g., 'volume', 'change'
        * 真实实现：调用外部API获取榜单数据
        */
     /**
