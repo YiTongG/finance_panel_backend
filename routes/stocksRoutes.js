@@ -4,14 +4,6 @@ const express = require('express');
 const router = express.Router();
 const stockController = require('../controllers/stockController');
 
-/**
- * Get Stock Indexes
- * @route GET /api/stocks/indexes
- * @group Stock - Operations about stocks
- * @returns {Array<object>} 200 - An array of stock index data.
- * @returns {Error} - An error message
- */
-router.get('/indexes', stockController.getIndexes);
 
 /**
  * Get Hot Stocks
