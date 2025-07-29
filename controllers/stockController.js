@@ -2,7 +2,6 @@
    
 const StockModel = require('../models/stockModel'); 
 
-// 获取大盘指数
 exports.getIndexes = async (req, res) => {
     try {
         const data = await StockModel.fetchIndexes();
