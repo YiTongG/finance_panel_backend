@@ -39,16 +39,12 @@ const MOCK_INDEXES = [
   
 // models/stocksModel.js
 const axios = require('axios');
+// const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY;
+// const RAPIDAPI_HOST = process.env.RAPIDAPI_HOST;
 
+const RAPIDAPI_KEY ="49d24ba246mshba11ea8aedeb983p1ae17djsn428ecf5c3ad1";
+const RAPIDAPI_HOST ="yahoo-finance15.p.rapidapi.com ";
 
-const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY;
-const RAPIDAPI_HOST = process.env.RAPIDAPI_HOST;
-
-// (Ticker)
-// ^GSPC: 标普500, ^DJI: 道琼斯, ^IXIC: 纳斯达克
-// 000001.SS: 上证指数, 399001.SZ: 深证成指
-const INDEX_TICKERS = ['^GSPC', '^DJI', '^IXIC', '000001.SS', '399001.SZ'];
-=======
 
 const INDEX_TICKERS = [
     // US Indices
@@ -286,16 +282,19 @@ const INDEX_TICKERS = [
             // 1. 修复 SQL 语句格式（移除多余换行，确保语法正确）
             const sql = `
                 SELECT 
-                    stock_code,
-                    full_name,
-                    open_price,
-                    high_price,
-                    low_price,
-                    close_price
-                FROM stock_price_history
-                WHERE 
-                    full_name LIKE ?
-                    AND time_interval = '1m'
+                stock_code,
+                full_name,
+                open_price,
+                high_price,
+                low_price,
+                close_price,
+                timestamp
+            FROM stock_price_history
+            WHERE 
+                full_name LIKE ?
+                AND time_interval = '1m'
+            ORDER BY timestamp DESC  
+              LIMIT 1  
             `;
     
             // 2. 正确处理 mysql 库的参数绑定（使用回调+Promise 封装）
