@@ -17,4 +17,13 @@ router.get('/chart/:ticker', indexController.fetchChartInfo);
  */
 router.get('/regionTrend', indexController.fetchRegionTrending);
 
+/**
+ * Get Global Indexes
+ * @route GET /api/indexes/all
+ * @group Index - Operations about indexes
+ * @returns {Array<object>} 200 - An array of  indexes data.
+ * @returns {Error} - An error message
+ */
+router.get('/all', indexController.getIndexes);
+
 module.exports = router;
