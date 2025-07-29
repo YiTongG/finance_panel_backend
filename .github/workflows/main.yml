@@ -33,3 +33,19 @@ jobs:
       - name: Validate PR commits with commitlint
         if: github.event_name == 'pull_request'
         run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
+  eslint:
+    runs-on: ubuntu-latest
+    steps:
+      # Check out the repository
+      - uses: actions/checkout@v1
+
+      # Install Node.js
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+
+      # Install your dependencies
+      - run: npm ci
+
+      # Run ESLint
+      - uses: eslint/github-action@v0
