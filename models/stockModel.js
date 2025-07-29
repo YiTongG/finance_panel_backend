@@ -1,7 +1,7 @@
 // models/stocksModel.js
 
-// const axios = require('axios'); // 真实情况会用axios等工具请求外部API
-const db = require('../db'); // 导入你的数据库连接
+// const axios = require('axios'); 
+const db = require('../db'); 
 
 
   const HOT_STOCK_UNIVERSE = [
@@ -84,8 +84,8 @@ const INDEX_TICKERS = [
             return formattedData;
 
         } catch (error) {
-            console.error('调用 Yahoo Finance API 失败:', error.response ? error.response.data : error.message);
-            throw new Error('获取外部指数数据失败。');
+            console.error('fail to call yahoo api:', error.response ? error.response.data : error.message);
+            throw new Error('fail to get data from external api');
         }
     }
   

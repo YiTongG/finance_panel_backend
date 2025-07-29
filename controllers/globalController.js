@@ -6,7 +6,7 @@ exports.fetchNews = async (req, res) => {
         const data = await globalModel.fetchNews();
         res.json(data); 
     } catch (error) {
-        res.status(500).json({ message: '获取指数趋势分布信息失败', error: error.message });
+        res.status(500).json({ message: 'fail to fetch daily news', error: error.message });
     }
 };
 
