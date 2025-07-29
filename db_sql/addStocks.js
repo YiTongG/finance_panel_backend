@@ -3,8 +3,9 @@ const axios = require('axios');
 const mysql = require('mysql2/promise');
 const fetchSymbols = require('./getStocks');
 
-// ✅ 替换为你的 RapidAPI Key
 const RAPIDAPI_KEY = '0359ffe29fmshe5032451d5e5666p16633ejsnb46adcfb169e';
+const region = 'US';
+const lang = 'en-US';
 
 // const STOCK_SYMBOL = 'JPM'; // 要查询的股票代码
 
@@ -24,8 +25,8 @@ async function fetchProfile(symbol) {
     const response = await axios.get(url, {
         params: {
             symbol,
-            region: 'US',
-            lang: 'en-US'
+            region: region,
+            lang: lang
         },
         headers: {
             'X-RapidAPI-Key': RAPIDAPI_KEY,
@@ -48,7 +49,7 @@ async function fetchQuote(symbol) {
     const url = `https://yh-finance.p.rapidapi.com/market/v2/get-quotes`;
     const response = await axios.get(url, {
         params: {
-            region: 'US',
+            region: region,
             symbols: symbol
         },
         headers: {
@@ -127,23 +128,23 @@ async function updateStockInfo() {
                     ]
                 );
 
-                console.log(`✅ 股票 ${symbol} 信息已更新或插入。`);
+                console.log(`股票 ${symbol} 信息已更新或插入。`);
             } catch (insertErr) {
                 if (insertErr.code === 'ER_DUP_ENTRY') {
-                    console.warn(`⚠️ 股票 ${symbol} 已存在，跳过。`);
+                    console.warn(`股票 ${symbol} 已存在，跳过。`);
                     continue;
                 } else {
-                    console.error(`❌ 插入股票 ${symbol} 信息失败：`, insertErr);
+                    console.error(`插入股票 ${symbol} 信息失败：`, insertErr);
                     continue;
                 }
             }
         }
 
     } catch (err) {
-        console.error('❌ fetchSymbols 或其他错误：', err);
+        console.error('fetchSymbols 或其他错误：', err);
     } finally {
         await db.end();
-        console.log('✅ 所有数据处理完成');
+        console.log('所有数据处理完成');
     }
 }
 
