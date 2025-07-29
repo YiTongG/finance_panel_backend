@@ -264,7 +264,7 @@ const INDEX_TICKERS = [
                 full_name LIKE ?
                 AND time_interval = '1m'
             ORDER BY timestamp DESC  
-              LIMIT 1  
+            LIMIT 1  
             `;
     
             // 2. 正确处理 mysql 库的参数绑定（使用回调+Promise 封装）
@@ -304,7 +304,83 @@ const INDEX_TICKERS = [
             console.error('搜索股票失败:', error);
             throw error;
         }
+    }    
+    /**
+     * 搜索单只股票的历史数据并返回格式化数据
+     * @param {string} "symbol, interval"  - 搜索关键词（Symbol、interval）
+     * @returns {Promise<object>} 格式化后的响应数据
+     */
+    static async searchHistory(symbol, interval) {
+        try {
+            const sql = `
+            SELECT
+                stock_code,
+                full_name,
+                timestamp,
+                open_price,
+                close_price,
+                high_price,
+                low_price,
+                volume,
+                (high_price - low_price)/open_price AS intraday_volatility,
+                (high_price + low_price)/2 AS aver_price
+            FROM 
+                stock_price_history
+            WHERE 
+                stock_code = ?
+                AND time_interval = ?
+            ORDER BY 
+                timestamp ASC
+            `;
+         // 2. 正确处理 mysql 库的参数绑定（使用回调+Promise 封装）
+            const results = await new Promise((resolve, reject) => {
+                // 确保参数数组格式正确，与 SQL 中的 ? 一一对应
+                db.query(sql, [symbol, interval], (err, results) => {
+                    if (err) {
+                        console.error('SQL 执行错误:', err); // 打印具体错误
+                        reject(err);
+                    } else {
+                        resolve(results);
+                    }
+                });
+            });
+    
+            // 验证结果格式
+            if (!Array.isArray(results)) {
+                throw new Error('数据库查询返回格式不正确');
+            }
+         // 格式化数据 - 修正变量名并完善字段处理
+        const formattedData = results.map(item => ({
+            // 基础信息
+            stockCode: item.stock_code || '',
+            fullName: item.full_name || '未知名称',
+            timestamp: item.timestamp,  // 保留时间戳
+            
+            // 价格信息（格式化数字）
+            openPrice: item.open_price !== null ? Number(item.open_price).toFixed(2) : '0.00',
+            highPrice: item.high_price !== null ? Number(item.high_price).toFixed(2) : '0.00',
+            lowPrice: item.low_price !== null ? Number(item.low_price).toFixed(2) : '0.00',
+            closePrice: item.close_price !== null ? Number(item.close_price).toFixed(2) : '0.00',
+            
+            // 新增：成交量（整数处理）
+            volume: item.volume !== null ? Number(item.volume).toLocaleString() : '0',
+            
+            // 波动率和平均价格（保留相应小数位）
+            intradayVolatility: item.intraday_volatility !== null 
+            ? (Number(item.intraday_volatility) * 100).toFixed(2) + '%' 
+            : '0.00%',
+            averagePrice: item.aver_price !== null ? Number(item.aver_price).toFixed(2) : '0.00'
+        }));
+
+        return {
+            success: true,
+            count: formattedData.length,
+            data: formattedData,
+        };
+    } catch (error) {
+        console.error('搜索股票失败:', error);
+        throw error;
     }
-        
   }
+}
   module.exports = StockModel;
