@@ -2,7 +2,6 @@
    
 const StockModel = require('../models/stockModel'); 
 
-// 获取大盘指数
 exports.getIndexes = async (req, res) => {
     try {
         const data = await StockModel.fetchIndexes();
@@ -44,13 +43,56 @@ exports.getTrends = async (req, res) => {
 // 搜索股票
 exports.searchStocks = async (req, res) => {
     try {
-        const { q } = req.query; // 获取搜索词
-        if (!q) {
-            return res.status(400).json({ message: '搜索关键词不能为空' });
+        // 从路径参数获取query
+        const { query } = req.query;  
+        
+        if (!query) {
+            return res.status(400).json({
+                success: false,
+                message: '请提供搜索关键词'
+            });
         }
-        const data = await StockModel.searchStocks(q);
-        res.json(data);
+        
+        const result = await StockModel.searchStocksByFullName(query);
+        return res.json(result);
     } catch (error) {
-        res.status(500).json({ message: '搜索股票失败', error: error.message });
+        console.error('搜索股票失败:', error);
+        return res.status(500).json({
+            success: false,
+            message: '服务器内部错误'
+        });
+    }
+};
+
+// 单只股票的历史数据加详细信息
+exports.searchHistoryStocks = async (req, res) => {
+    try {
+        // 从查询参数获取股票代码和时间间隔
+        const { symbol, interval } = req.query;  
+        
+        // 验证参数是否存在
+        if (!symbol) {
+            return res.status(400).json({
+                success: false,
+                message: '请提供股票代码（symbol）'
+            });
+        }
+        
+        if (!interval) {
+            return res.status(400).json({
+                success: false,
+                message: '请提供时间间隔（interval）'
+            });
+        }
+        
+        // 调用模型方法，传入股票代码和时间间隔
+        const result = await StockModel.searchHistory(symbol, interval);
+        return res.json(result);
+    } catch (error) {
+        console.error('获取股票历史数据失败:', error);
+        return res.status(500).json({
+            success: false,
+            message: '服务器内部错误'
+        });
     }
 };
