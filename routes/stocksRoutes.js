@@ -17,5 +17,4 @@ router.get('/getTrends/:symbol', stockController.getTrends);
 // GET /api/stocks/search -> 搜索股票
 router.get('/search', stockController.searchStocks);
 
-
 module.exports = router;

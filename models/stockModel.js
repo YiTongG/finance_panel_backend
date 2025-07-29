@@ -1,7 +1,7 @@
 // models/stocksModel.js
 
 // const axios = require('axios'); // 真实情况会用axios等工具请求外部API
-// const db = require('../db'); // 导入你的数据库连接
+const db = require('../db'); // 导入你的数据库连接
 
 // --- 模拟数据区 ---
 // 在真实应用中，这些数据会从外部API或数据库获取
@@ -43,7 +43,8 @@ const axios = require('axios');
 
 const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY ;
 const RAPIDAPI_HOST = process.env.RAPIDAPI_HOST;
-
+// const RAPIDAPI_KEY = "49d24ba246mshba11ea8aedeb983p1ae17djsn428ecf5c3ad1" ;
+// const RAPIDAPI_HOST = "yahoo-finance15.p.rapidapi.com ";
 // (Ticker)
 // ^GSPC: 标普500, ^DJI: 道琼斯, ^IXIC: 纳斯达克
 // 000001.SS: 上证指数, 399001.SZ: 深证成指
@@ -234,26 +235,71 @@ const INDEX_TICKERS = ['^GSPC', '^DJI', '^IXIC', '000001.SS', '399001.SZ'];
         }
     }
     
+    /**
+     * 搜索股票并返回格式化数据
+     * @param {string} query - 搜索关键词
+     * @returns {Promise<object>} 格式化后的响应数据
+     */
+    static async searchStocksByFullName(query) {
+        try {
+            // 验证输入参数
+            if (!query || typeof query !== 'string') {
+                throw new Error('无效的搜索关键词');
+            }
     
+            // 1. 修复 SQL 语句格式（移除多余换行，确保语法正确）
+            const sql = `
+                SELECT 
+                    stock_code,
+                    full_name,
+                    open_price,
+                    high_price,
+                    low_price,
+                    close_price
+                FROM stock_price_history
+                WHERE 
+                    full_name LIKE ?
+                    AND time_interval = '1m'
+            `;
     
+            // 2. 正确处理 mysql 库的参数绑定（使用回调+Promise 封装）
+            const results = await new Promise((resolve, reject) => {
+                // 确保参数数组格式正确，与 SQL 中的 ? 一一对应
+                db.query(sql, [`%${query}%`], (err, results) => {
+                    if (err) {
+                        console.error('SQL 执行错误:', err); // 打印具体错误
+                        reject(err);
+                    } else {
+                        resolve(results);
+                    }
+                });
+            });
     
-      /**
-       * 搜索股票
-       * @param {string} query - 搜索关键词
-       * 真实实现：查询持久化在自己数据库中的股票基础信息表
-       */
-      static async searchStocks(query) {
-          // const sql = "SELECT ticker, name FROM stocks WHERE ticker LIKE ? OR name LIKE ?";
-          // const results = await db.query(sql, [`%${query}%`, `%${query}%`]);
-          // return results;
-  
-          // 模拟数据库查询
-          const lowerCaseQuery = query.toLowerCase();
-          const results = MOCK_STOCK_LIST.filter(
-              stock => stock.ticker.toLowerCase().includes(lowerCaseQuery) || stock.name.toLowerCase().includes(lowerCaseQuery)
-          );
-          return new Promise(resolve => setTimeout(() => resolve(results), 50));
-      }
+            // 验证结果格式
+            if (!Array.isArray(results)) {
+                throw new Error('数据库查询返回格式不正确');
+            }
+    
+            // 格式化数据
+            const formattedData = results.map(item => ({
+                stockCode: item.stock_code,
+                fullName: item.full_name,
+                openPrice: item.open_price,
+                highPrice: item.high_price,
+                lowPrice: item.low_price,
+                closePrice: item.close_price
+            }));
+    
+            return {
+                success: true,
+                count: formattedData.length,
+                data: formattedData
+            };
+        } catch (error) {
+            console.error('搜索股票失败:', error);
+            throw error;
+        }
+    }
+        
   }
-  
   module.exports = StockModel;

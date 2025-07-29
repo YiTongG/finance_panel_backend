@@ -44,13 +44,23 @@ exports.getTrends = async (req, res) => {
 // 搜索股票
 exports.searchStocks = async (req, res) => {
     try {
-        const { q } = req.query; // 获取搜索词
-        if (!q) {
-            return res.status(400).json({ message: '搜索关键词不能为空' });
+        // 从路径参数获取query
+        const { query } = req.query;  
+        
+        if (!query) {
+            return res.status(400).json({
+                success: false,
+                message: '请提供搜索关键词'
+            });
         }
-        const data = await StockModel.searchStocks(q);
-        res.json(data);
+        
+        const result = await StockModel.searchStocksByFullName(query);
+        return res.json(result);
     } catch (error) {
-        res.status(500).json({ message: '搜索股票失败', error: error.message });
+        console.error('搜索股票失败:', error);
+        return res.status(500).json({
+            success: false,
+            message: '服务器内部错误'
+        });
     }
 };
