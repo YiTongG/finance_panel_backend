@@ -64,3 +64,36 @@ exports.searchStocks = async (req, res) => {
         });
     }
 };
+
+// 单只股票的历史数据加详细信息
+exports.searchHistoryStocks = async (req, res) => {
+    try {
+        // 从查询参数获取股票代码和时间间隔
+        const { symbol, interval } = req.query;  
+        
+        // 验证参数是否存在
+        if (!symbol) {
+            return res.status(400).json({
+                success: false,
+                message: '请提供股票代码（symbol）'
+            });
+        }
+        
+        if (!interval) {
+            return res.status(400).json({
+                success: false,
+                message: '请提供时间间隔（interval）'
+            });
+        }
+        
+        // 调用模型方法，传入股票代码和时间间隔
+        const result = await StockModel.searchHistory(symbol, interval);
+        return res.json(result);
+    } catch (error) {
+        console.error('获取股票历史数据失败:', error);
+        return res.status(500).json({
+            success: false,
+            message: '服务器内部错误'
+        });
+    }
+};
