@@ -1,3 +1,4 @@
+
 const axios = require('axios');
 
 const region = 'US';
@@ -11,10 +12,12 @@ async function fetchSymbols() {
         method: 'GET',
         url: 'https://yh-finance.p.rapidapi.com/market/v2/get-movers',
         params: {
+
             region: region,
             lang: lang,
             count: count,
             start: start,           // 返回多少条数据
+
         },
         headers: {
             'X-RapidAPI-Key': '0359ffe29fmshe5032451d5e5666p16633ejsnb46adcfb169e',
