@@ -1,34 +1,17 @@
-const Transaction = require('../models/transactionModel');
 
-module.exports = {
-  getAllTransactions: (req, res) => {
-    Transaction.getAll((err, results) => {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json(results);
-    });
-  },
-  
-  createTransaction: (req, res) => {
-    const newTransaction = req.body;
-    Transaction.create(newTransaction, (err, result) => {
-      if (err) return res.status(400).json({ error: err.message });
-      res.status(201).json({ id: result.insertId, ...newTransaction });
-    });
-  },
 
-  updateTransaction: (req, res) => {
-    const id = req.params.id;
-    Transaction.update(id, req.body, (err) => {
-      if (err) return res.status(400).json({ error: err.message });
-      res.json({ id, ...req.body });
-    });
-  },
+const transactionModel = require('../models/transactionModel');
 
-  deleteTransaction: (req, res) => {
-    const id = req.params.id;
-    Transaction.delete(id, (err) => {
-      if (err) return res.status(400).json({ error: err.message });
-      res.json({ message: 'Transaction deleted' });
-    });
-  }
-};
+  exports.getUserStockInformation=async (req, res) => {
+    try {
+      const { UserID } = req.params;
+
+      if (!UserID) {
+        return res.status(400).json({ message: 'UserID参数不能为空' });
+      }
+     const data = await transactionModel.getInformation(UserID);
+     res.json(data); 
+   } catch (error) {
+     res.status(500).json({ message: '获取用户股票信息失败', error: error.message });
+   }
+ };
