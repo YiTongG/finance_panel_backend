@@ -97,7 +97,7 @@ async function updateStockInfo() {
             console.log(data);
 
             try {
-                const [rows] = await db.execute(
+                await db.execute(
                     `
                 INSERT INTO stocks (
                     stock_code, full_name, market_sector, industry, currency,
