@@ -209,7 +209,7 @@ class StockModel {
             fullName: item.full_name || '未知名称',
             timestamp: item.timestamp,  // 保留时间戳
             
-            // 价格信息（格式化数字）
+            // 价格信息（格式化数字） 
             openPrice: item.open_price !== null ? Number(item.open_price).toFixed(2) : '0.00',
             highPrice: item.high_price !== null ? Number(item.high_price).toFixed(2) : '0.00',
             lowPrice: item.low_price !== null ? Number(item.low_price).toFixed(2) : '0.00',

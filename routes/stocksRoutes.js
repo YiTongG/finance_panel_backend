@@ -30,7 +30,7 @@ router.get('/hot', stockController.getHotStocks);
  */
 router.get('/search', stockController.searchStocks);
  
-/** 
+/**  
  * Get Historical Stock Data
  * @description Fetches historical time-series data (candlesticks) for a specific stock symbol based on a given time interval.
  * @route GET /api/stocks/history

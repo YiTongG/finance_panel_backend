@@ -17,7 +17,7 @@ const db = mysql.createConnection({
 });
 
 // 连接数据库
-db.connect(err => {
+db.connect(err => { 
   if (err) {
     console.error('MySQL connection error:', err.stack);
     return;
@@ -36,7 +36,7 @@ function execute(sql, params) {
     });
   });
 }
-
+ 
 // 开始事务
 function beginTransaction() {
   return new Promise((resolve, reject) => {

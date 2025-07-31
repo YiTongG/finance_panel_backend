@@ -31,7 +31,7 @@ exports.searchStocks = async (req, res) => {
         return res.json(result);
     } catch (error) {
         console.error('搜索股票失败:', error);
-        return res.status(500).json({
+        return res.status(500).json({ 
             success: false,
             message: '服务器内部错误'
         });
