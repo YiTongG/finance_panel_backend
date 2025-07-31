@@ -2,10 +2,10 @@
    
 const IndexModel = require('../models/indexModel'); 
 
-// 获取大盘指数
+//获取大盘指数
 exports.getIndexes = async (req, res) => {
     try {
-        const data = await StockModel.fetchIndexes();
+        const data = await IndexModel.fetchIndexes();
         res.json(data); 
     } catch (error) {
         res.status(500).json({ message: '获取指数数据失败', error: error.message });
