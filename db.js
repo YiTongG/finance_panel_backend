@@ -1,14 +1,9 @@
 const mysql = require('mysql');
 require('dotenv').config();
 
-// 
-// const db = mysql.createConnection({
-//   host: "localhost",
-//   user: "WMySql",
-//   password: "123456",
-//   database: "finance_db"
-// });
-// 创建数据库连接
+
+
+//创建数据库连接
 const db = mysql.createConnection({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -74,7 +69,7 @@ function rollback() {
 }
 
 // 获取用户持有的股票数量
-async function getUserStockShares(userId, stockCode) {
+async function getUserStockQuantity(userId, stockCode) {
   const sql = `
     SELECT IFNULL(quantity, 0) as quantity 
     FROM user_trade 
@@ -85,7 +80,7 @@ async function getUserStockShares(userId, stockCode) {
 }
 
 // 获取用户当前资金
-async function getUserMon(userId) {
+async function getUserMoney(userId) {
   const sql = 'SELECT money FROM user WHERE id = ?';
   const results = await execute(sql, [userId]);
   if (results.length === 0) {
@@ -101,6 +96,6 @@ module.exports = {
   beginTransaction,
   commit,
   rollback,
-  getUserStockShares,
-  getUserMon
+  getUserStockQuantity,
+  getUserMoney
 };
