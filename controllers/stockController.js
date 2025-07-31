@@ -12,8 +12,7 @@ exports.getHotStocks = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: '获取热门股票数据失败', error: error.message });
     }
-};
-
+};  
 
 // 搜索股票
 exports.searchStocks = async (req, res) => {

@@ -202,7 +202,7 @@ class StockModel {
             if (!Array.isArray(results)) {
                 throw new Error('数据库查询返回格式不正确');
             }
-         // 格式化数据 - 修正变量名并完善字段处理
+         // 格式化数据 - 修正变量名并完善字段处理 
         const formattedData = results.map(item => ({
             // 基础信息
             stockCode: item.stock_code || '',
