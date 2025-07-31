@@ -10,4 +10,7 @@ const   transactionController= require('../controllers/transactionController');
 ///api/transactions/user/45430196
 router.get('/user/:UserID', transactionController.getUserStockInformation);
 
+///api/transactions/
+router.post('/execute', transactionController.handleTransaction);
+
 module.exports = router;
