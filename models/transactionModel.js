@@ -199,7 +199,7 @@ static async executeTransaction(userId, stockCode, type, shares, price) {
   static async getUserStockQuantity(userId, stockCode) {
     return db.getStockQuantity(userId, stockCode);
   }
-
+ 
   static async getUserMoney(userId) {
     return db.getMoney(userId);
   }

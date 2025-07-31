@@ -2,13 +2,6 @@ const mysql = require('mysql');
 require('dotenv').config();
 
 
-// const db = mysql.createConnection({
-//   host: "localhost",
-//   user: "WMySql",
-//   password: "123456",
-//   database: "finance_db"
-// });
-
 //创建数据库连接
 const db = mysql.createConnection({
   host: process.env.DB_HOST,
@@ -18,7 +11,7 @@ const db = mysql.createConnection({
 });
 
 // 连接数据库
-db.connect(err => { 
+db.connect(err => {  
   if (err) {
     console.error('MySQL connection error:', err.stack);
     return;
