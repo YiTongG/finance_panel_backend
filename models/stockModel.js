@@ -105,59 +105,7 @@ class StockModel {
             throw new Error('获取热门股票数据失败。');
         }
     }
-  
-      /**
-       * 获取股票趋势
-       * 真实实现：调用外部API获取股票趋势推荐买入购入，
-       */
-      static async fetchTrends(symbol) {
-        if (!symbol) {
-            throw new Error("股票代码（symbol）不能为空");
-        }
-    
-        const options = {
-            method: 'GET',
-            url: `https://${RAPIDAPI_HOST}/api/v1/markets/stock/modules?ticker=${symbol}&module=recommendation-trend`,
-            headers: {
-                'x-rapidapi-key': RAPIDAPI_KEY,
-                'x-rapidapi-host': RAPIDAPI_HOST
-            } 
-        };
-        
-        try {
-            const response = await axios.request(options);
-            const stockData = response.data.body; // 获取返回的body数据
-            console.log("获取股票趋势数据:", stockData);
-            
-            // 关键修改：直接验证stockData下的trend数组
-            if (!stockData || !Array.isArray(stockData.trend)) {
-                console.error("API返回数据格式错误，trend数组不存在或不是数组:", stockData);
-                throw new Error("从API获取的趋势数据格式不正确（未找到有效的trend数组）");
-            }
-            
-            // 直接从stockData.trend数组提取所需字段
-            const trendData = stockData.trend.map(item => ({
-                period: item.period || '未知周期',
-                strongBuy: item.strongBuy || 0,
-                buy: item.buy || 0,
-                hold: item.hold || 0,
-                sell: item.sell || 0,
-                strongSell: item.strongSell || 0
-            }));
-    
-            return {
-                stockName: symbol,
-                trends: trendData,
-                maxAge: stockData.maxAge || null,
-           
-            };
-        } catch (error) {
-            console.error(`获取股票 ${symbol} 推荐趋势失败:`, error.response ? error.response.data : error.message);
-            throw new Error(`获取股票 ${symbol} 推荐趋势失败: ${error.message}`);
-        }
-    }
-
-    
+   
     /**
      * 搜索股票并返回格式化数据
      * @param {string} query - 搜索关键词
@@ -188,18 +136,12 @@ class StockModel {
             LIMIT 1  
             `;
     
-            // 2. 正确处理 mysql 库的参数绑定（使用回调+Promise 封装）
-            const results = await new Promise((resolve, reject) => {
-                // 确保参数数组格式正确，与 SQL 中的 ? 一一对应
-                db.query(sql, [`%${query}%`], (err, results) => {
-                    if (err) {
-                        console.error('SQL 执行错误:', err); // 打印具体错误
-                        reject(err);
-                    } else {
-                        resolve(results);
-                    }
-                });
-            });
+            const results = await db.execute(sql, [`%${query}%`]);
+
+            // 验证结果格式
+            if (!Array.isArray(results)) {
+                throw new Error('数据库查询返回格式不正确');
+            }
     
             // 验证结果格式
             if (!Array.isArray(results)) {
@@ -254,30 +196,20 @@ class StockModel {
                 timestamp ASC
             `;
          // 2. 正确处理 mysql 库的参数绑定（使用回调+Promise 封装）
-            const results = await new Promise((resolve, reject) => {
-                // 确保参数数组格式正确，与 SQL 中的 ? 一一对应
-                db.query(sql, [symbol, interval], (err, results) => {
-                    if (err) {
-                        console.error('SQL 执行错误:', err); // 打印具体错误
-                        reject(err);
-                    } else {
-                        resolve(results);
-                    }
-                });
-            });
-    
+         const results = await db.execute(sql, [symbol, interval]);
+
             // 验证结果格式
             if (!Array.isArray(results)) {
                 throw new Error('数据库查询返回格式不正确');
             }
-         // 格式化数据 - 修正变量名并完善字段处理
+         // 格式化数据 - 修正变量名并完善字段处理 
         const formattedData = results.map(item => ({
             // 基础信息
             stockCode: item.stock_code || '',
             fullName: item.full_name || '未知名称',
             timestamp: item.timestamp,  // 保留时间戳
             
-            // 价格信息（格式化数字）
+            // 价格信息（格式化数字） 
             openPrice: item.open_price !== null ? Number(item.open_price).toFixed(2) : '0.00',
             highPrice: item.high_price !== null ? Number(item.high_price).toFixed(2) : '0.00',
             lowPrice: item.low_price !== null ? Number(item.low_price).toFixed(2) : '0.00',
@@ -304,4 +236,4 @@ class StockModel {
     }
   }
 }
-  module.exports = StockModel;
+module.exports = StockModel;
