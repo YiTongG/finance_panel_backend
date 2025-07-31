@@ -97,29 +97,29 @@ class transactionModel {
     return rows.length > 0 ? rows[0].quantity : 0;
 }
 
-/**
- * 获取用户的资金余额
- * @param {number} userId - 用户ID
- * @returns {Promise<number>} 资金余额
- */
-static async getUserMoney(userId) {
+ /**
+   * 获取用户的资金余额
+   * @param {number} userId - 用户ID
+   * @returns {Promise<number>} 资金余额
+   */
+  static async getUserMoney(userId) {
     const [rows] = await db.execute(
-        'SELECT money FROM user WHERE id = ?',
-        [userId]
+      'SELECT money FROM user WHERE id = ?',
+      [userId]
     );
     return rows.length > 0 ? rows[0].money : 0;
-}
+  }
 
-/**
- * 执行交易
- * @param {number} userId - 用户ID
- * @param {string} stockCode - 股票代码
- * @param {'BUY'|'SELL'} type - 交易类型
- * @param {number} shares - 交易数量
- * @param {number} price - 股票价格
- * @returns {Promise<object>} 交易结果
- */
-static async executeTransaction(userId, stockCode, type, shares, price) {
+  /**
+   * 执行交易
+   * @param {number} userId - 用户ID
+   * @param {string} stockCode - 股票代码
+   * @param {'BUY'|'SELL'} type - 交易类型
+   * @param {number} shares - 交易数量
+   * @param {number} price - 股票价格
+   * @returns {Promise<object>} 交易结果
+   */
+  static async executeTransaction(userId, stockCode, type, shares, price) {
     // 计算交易金额
     const amount = shares * price;
 
@@ -127,10 +127,10 @@ static async executeTransaction(userId, stockCode, type, shares, price) {
     await db.beginTransaction();
 
     try {
-      // 获取当前数据（使用 model 里的方法，这里要确保 this 指向正确，或者直接用 db 里的方法）
+      // 获取当前数据（使用修改后的方法名避免重复）
       const [currentQuantity, currentMoney] = await Promise.all([
-        this.getUserStockQuantity(userId, stockCode),
-        this.getUserMoney(userId)
+        this.fetchUserStockQuantity(userId, stockCode),
+        this.fetchUserMoney(userId)
       ]);
 
       let newQuantity, newMoney;
@@ -195,14 +195,13 @@ static async executeTransaction(userId, stockCode, type, shares, price) {
     }
   }
 
-  // 把获取股票数量和资金的方法也挂载到 model 上，保持调用一致
-  static async getUserStockQuantity(userId, stockCode) {
-    return db.getUserStockQuantity(userId, stockCode);
+  // 修改方法名，解决重复问题
+  static async fetchUserStockQuantity(userId, stockCode) {
+    return db.getStockQuantity(userId, stockCode);
   }
 
-  static async getUserMoney(userId) {
-    return db.getUserMoney(userId);
+  static async fetchUserMoney(userId) {
+    return db.getMoney(userId);
   }
-
 }
 module.exports = transactionModel;
