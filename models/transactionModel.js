@@ -197,11 +197,11 @@ static async executeTransaction(userId, stockCode, type, shares, price) {
 
   // 把获取股票数量和资金的方法也挂载到 model 上，保持调用一致
   static async getUserStockQuantity(userId, stockCode) {
-    return db.getUserStockQuantity(userId, stockCode);
+    return db.getStockQuantity(userId, stockCode);
   }
 
   static async getUserMoney(userId) {
-    return db.getUserMoney(userId);
+    return db.getMoney(userId);
   }
 
 }
