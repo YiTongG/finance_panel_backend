@@ -23,24 +23,24 @@ exports.getHotStocks = async (req, res) => {
     }
 };
 
-// 获取股票趋势
-exports.getTrends = async (req, res) => {
-    try {
-        // 从路由参数中获取股票代码（如 AAPL、BABA）
-        const { symbol } = req.params;
+// // 获取股票趋势
+// exports.getTrends = async (req, res) => {
+//     try {
+//         // 从路由参数中获取股票代码（如 AAPL、BABA）
+//         const { symbol } = req.params;
         
-        // 验证股票代码是否存在
-        if (!symbol) {
-            return res.status(400).json({ message: '请提供股票代码（symbol）' });
-        }
+//         // 验证股票代码是否存在
+//         if (!symbol) {
+//             return res.status(400).json({ message: '请提供股票代码（symbol）' });
+//         }
         
-        // 将股票代码传递给模型层
-        const data = await StockModel.fetchTrends(symbol);
-        res.json(data);
-    } catch (error) {
-        res.status(500).json({ message: '获取趋势失败', error: error.message });
-    }
-};
+//         // 将股票代码传递给模型层
+//         const data = await StockModel.fetchTrends(symbol);
+//         res.json(data);
+//     } catch (error) {
+//         res.status(500).json({ message: '获取趋势失败', error: error.message });
+//     }
+// };
 // 搜索股票
 exports.searchStocks = async (req, res) => {
     try {
