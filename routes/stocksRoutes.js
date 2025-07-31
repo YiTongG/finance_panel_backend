@@ -17,16 +17,6 @@ router.get('/hot', stockController.getHotStocks);
 
 
 /**
- * Get Stock Recommendation Trends
- * @route GET /api/stocks/getTrends/{symbol}
- * @group Stock - Operations about stocks
- * @param {string} symbol.path.required - The stock symbol (e.g., AAPL).
- * @returns {object} 200 - An object containing trend data for the specified stock.
- * @returns {Error} - An error message
- */
-router.get('/getTrends/:symbol', stockController.getTrends);
-
-/**
  * Search for Stocks
  * @description Search for stocks by their full name or symbol using a fuzzy search (supports English and Pinyin).
  * @route GET /api/stocks/search
