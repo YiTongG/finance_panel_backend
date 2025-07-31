@@ -7,7 +7,7 @@ class transactionModel {
    * 
    */
   
-  static async getInformation(UserID) {
+  static async getInformation(userID) {
     const sql = `
         SELECT 
             u.id AS user_id,
@@ -33,11 +33,10 @@ class transactionModel {
             u.create_time, ut.stock_code, ut.trade_time 
         HAVING 
             holding_quantity > 0
-        LIMIT 5
     `;
     
     try {
-      const results = await db.execute(sql, [UserID]);
+      const results = await db.execute(sql, [userID]);
 
         // 验证结果格式是否为数组
         if (!Array.isArray(results)) {
