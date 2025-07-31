@@ -37,17 +37,7 @@ class transactionModel {
     `;
     
     try {
-        const results = await new Promise((resolve, reject) => {
-            // 确保参数数组与SQL中的?一一对应
-            db.query(sql, [UserID], (err, results) => {
-                if (err) {
-                    console.error('SQL 执行错误:', err);
-                    reject(err);
-                } else {
-                    resolve(results);
-                }
-            });
-        });
+      const results = await db.execute(sql, [UserID]);
 
         // 验证结果格式是否为数组
         if (!Array.isArray(results)) {
